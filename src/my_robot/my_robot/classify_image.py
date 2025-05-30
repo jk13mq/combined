@@ -142,12 +142,15 @@ class BirdClassifierNode(Node):
             image_tensor = self.preprocess_image(cv_image)
             
             # Classify image
-            predicted_class, confidence = self.classify_image(image_tensor)
+            class_name, confidence = self.classify_image(image_tensor)
             
             # Draw results on the image
-            result_text = f"Class: {predicted_class}, Confidence: {confidence:.2%}"
+            result_text = f"{class_name}: {confidence:.2%}"
             cv2.putText(cv_image, result_text, (10, 30), 
                        cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+            
+            # Add a border around the image
+            cv2.rectangle(cv_image, (0, 0), (cv_image.shape[1], cv_image.shape[0]), (0, 255, 0), 2)
             
             # Display the image
             cv2.imshow("Bird Classification", cv_image)
@@ -163,6 +166,7 @@ def main(args=None):
     try:
         # Create and run the node
         node = BirdClassifierNode()
+        node.get_logger().info('Press Ctrl+C to exit.')
         rclpy.spin(node)
         
     except KeyboardInterrupt:
