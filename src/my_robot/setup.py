@@ -29,6 +29,7 @@ setup(
             'arm_controller = my_robot.arm_controller:main',
             'arm_and_movement = my_robot.arm_and_movement:main',
             'camera_node = my_robot.camera_node:main',
+            'classify_image = my_robot.classify_image:main',
         ],
     },
 )
