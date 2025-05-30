@@ -138,6 +138,9 @@ class BirdClassifierNode(Node):
             cv_image = self.cv_bridge.imgmsg_to_cv2(msg, "bgr8")
             self.latest_image = cv_image
             
+            # Log image dimensions
+            self.get_logger().info(f'Received image with dimensions: {cv_image.shape}')
+            
             # Preprocess image
             image_tensor = self.preprocess_image(cv_image)
             
@@ -153,11 +156,17 @@ class BirdClassifierNode(Node):
             cv2.rectangle(cv_image, (0, 0), (cv_image.shape[1], cv_image.shape[0]), (0, 255, 0), 2)
             
             # Display the image
+            self.get_logger().info('Attempting to display image window...')
             cv2.imshow("Bird Classification", cv_image)
-            cv2.waitKey(1)
+            key = cv2.waitKey(1)
+            if key == 27:  # ESC key
+                self.get_logger().info('ESC key pressed, shutting down...')
+                rclpy.shutdown()
             
         except Exception as e:
             self.get_logger().error(f'Error in image callback: {str(e)}')
+            import traceback
+            self.get_logger().error(traceback.format_exc())
 
 def main(args=None):
     rclpy.init(args=args)
@@ -166,7 +175,7 @@ def main(args=None):
     try:
         # Create and run the node
         node = BirdClassifierNode()
-        node.get_logger().info('Press Ctrl+C to exit.')
+        node.get_logger().info('Press Ctrl+C or ESC to exit.')
         rclpy.spin(node)
         
     except KeyboardInterrupt:
