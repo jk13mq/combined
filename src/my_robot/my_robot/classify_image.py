@@ -74,7 +74,7 @@ class BirdClassifierNode(Node):
             
         # Initialize EfficientNet-B0 model from torchvision
         model = torchvision.models.efficientnet_b0(pretrained=False)
-        num_classes = 1000  # Adjust based on your model's number of classes
+        num_classes = 3  # Model was trained for 3 classes
         
         # Modify the final layer to match your number of classes
         model.classifier[1] = torch.nn.Linear(model.classifier[1].in_features, num_classes)
@@ -119,7 +119,12 @@ class BirdClassifierNode(Node):
             probabilities = torch.nn.functional.softmax(outputs[0], dim=0)
             predicted_class = torch.argmax(probabilities).item()
             confidence = probabilities[predicted_class].item()
-        return predicted_class, confidence
+            
+            # Map class index to class name
+            class_names = ['no_bird', 'bird', 'multiple_birds']  # Update these based on your training
+            class_name = class_names[predicted_class]
+            
+        return class_name, confidence
 
     def image_callback(self, msg):
         """
