@@ -143,6 +143,7 @@ class BirdClassifierNode(Node):
 
 def main(args=None):
     rclpy.init(args=args)
+    node = None
     
     try:
         # Create and run the node
@@ -150,9 +151,13 @@ def main(args=None):
         rclpy.spin(node)
         
     except KeyboardInterrupt:
-        node.get_logger().info('Keyboard interrupt detected, shutting down.')
+        if node:
+            node.get_logger().info('Keyboard interrupt detected, shutting down.')
     except Exception as e:
-        node.get_logger().error(f'Error running node: {str(e)}')
+        if node:
+            node.get_logger().error(f'Error running node: {str(e)}')
+        else:
+            print(f'Error initializing node: {str(e)}')
     finally:
         # Clean up
         cv2.destroyAllWindows()
