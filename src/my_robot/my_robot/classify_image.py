@@ -6,6 +6,7 @@ from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 import cv2
 import torch
+import torchvision
 import torchvision.transforms as transforms
 from PIL import Image as PILImage
 import numpy as np
