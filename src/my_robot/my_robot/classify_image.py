@@ -31,10 +31,19 @@ class BirdClassifierNode(Node):
         self.cv_bridge = CvBridge()
         self.latest_image = None
         
+        # Get the package path
+        self.package_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        model_path = os.path.join(self.package_path, 'models', 'best_bird_classifier.pth')
+        
         # Load the PyTorch model
         self.get_logger().info('Loading PyTorch model...')
-        self.model = self.load_model("best_bird_classifier.pth")
-        self.get_logger().info('Model loaded successfully')
+        try:
+            self.model = self.load_model(model_path)
+            self.get_logger().info('Model loaded successfully')
+        except Exception as e:
+            self.get_logger().error(f'Failed to load model: {str(e)}')
+            self.get_logger().error(f'Please ensure the model file exists at: {model_path}')
+            raise
         
         # Define image preprocessing
         self.transform = transforms.Compose([
