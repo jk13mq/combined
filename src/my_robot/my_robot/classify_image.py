@@ -71,12 +71,12 @@ class BirdClassifierNode(Node):
         if not os.path.exists(model_path):
             raise FileNotFoundError(f"Model file not found at {model_path}")
             
-        # Initialize model (adjust architecture as needed)
-        model = torch.hub.load('pytorch/vision:v0.10.0', 'resnet50', pretrained=False)
+        # Initialize EfficientNet-B0 model
+        model = torch.hub.load('NVIDIA/DeepLearningExamples:torchhub', 'nvidia_efficientnet_b0', pretrained=False)
         num_classes = 1000  # Adjust based on your model's number of classes
         
         # Modify the final layer to match your number of classes
-        model.fc = torch.nn.Linear(model.fc.in_features, num_classes)
+        model.classifier.fc = torch.nn.Linear(model.classifier.fc.in_features, num_classes)
         
         # Load the trained weights
         model.load_state_dict(torch.load(model_path))
