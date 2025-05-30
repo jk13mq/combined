@@ -32,7 +32,7 @@ class BirdClassifierNode(Node):
         self.latest_image = None
         
         # Get the package path
-        self.package_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        self.package_path = os.path.dirname(os.path.abspath(__file__))
         model_path = os.path.join(self.package_path, 'models', 'best_bird_classifier.pth')
         
         # Load the PyTorch model
