@@ -121,7 +121,7 @@ class BirdClassifierNode(Node):
             confidence = probabilities[predicted_class].item()
             
             # Map class index to class name
-            class_names = ['no_bird', 'bird', 'multiple_birds']  # Update these based on your training
+            class_names = ['australian_magpie', 'king_parrot', 'little_corella']
             class_name = class_names[predicted_class]
             
         return class_name, confidence
