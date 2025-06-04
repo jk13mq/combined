@@ -254,37 +254,166 @@ class MovementCommandGenerator:
     
     def __init__(self, analyzer: AudioAnalyzer):
         self.analyzer = analyzer
-        # Define arm positions for different movement patterns
+        # Define more complex arm positions for different movement patterns
         self.arm_positions = {
-            "aggressive_dance": {
-                "forward": {2: 700, 3: 600, 4: 500},  # Raised position
-                "return": {2: 300, 3: 400, 4: 700}    # Lowered position
+            "snake_wave": {
+                "forward": {
+                    "sequence": [
+                        {2: 700, 3: 400, 4: 600},  # Wave up
+                        {2: 400, 3: 700, 4: 400},  # Wave down
+                        {2: 600, 3: 500, 4: 700}   # Wave middle
+                    ],
+                    "return": {2: 500, 3: 500, 4: 500}
+                }
             },
-            "energetic_spin": {
-                "forward": {1: 600, 2: 700, 3: 500},  # Extended position
-                "return": {1: 400, 2: 300, 3: 600}    # Retracted position
-            },
-            "spiral_right": {
-                "forward": {1: 600, 2: 700, 3: 400},  # Right extended
-                "return": {1: 400, 2: 300, 3: 600}    # Left retracted
-            },
-            "spiral_left": {
-                "forward": {1: 400, 2: 700, 3: 600},  # Left extended
-                "return": {1: 600, 2: 300, 3: 400}    # Right retracted
-            },
-            "forward_groove": {
-                "forward": {2: 700, 3: 700, 4: 500},  # Raised position
-                "return": {2: 300, 3: 300, 4: 700}    # Lowered position
-            },
-            "shake_dance": {
-                "forward": {4: 700, 5: 700},          # Wrist up
-                "return": {4: 300, 5: 300}            # Wrist down
+            "energy_burst": {
+                "forward": {
+                    "sequence": [
+                        {2: 700, 3: 700, 4: 700},  # Full extension
+                        {2: 300, 3: 300, 4: 300},  # Full contraction
+                        {2: 600, 3: 600, 4: 600}   # Mid position
+                    ],
+                    "return": {2: 500, 3: 500, 4: 500}
+                }
             },
             "gentle_sway": {
-                "forward": {2: 600, 3: 500, 4: 500},  # Gentle raise
-                "return": {2: 400, 3: 500, 4: 500}    # Gentle lower
+                "forward": {
+                    "sequence": [
+                        {2: 550, 3: 450, 4: 550},  # Slight up
+                        {2: 450, 3: 550, 4: 450},  # Slight down
+                        {2: 500, 3: 500, 4: 500}   # Center
+                    ],
+                    "return": {2: 500, 3: 500, 4: 500}
+                }
+            },
+            "spiral_motion": {
+                "forward": {
+                    "sequence": [
+                        {1: 600, 2: 700, 3: 400},  # Spiral up
+                        {1: 400, 2: 300, 3: 600},  # Spiral down
+                        {1: 500, 2: 500, 3: 500}   # Center
+                    ],
+                    "return": {1: 500, 2: 500, 3: 500}
+                }
+            },
+            "wave_dance": {
+                "forward": {
+                    "sequence": [
+                        {4: 700, 5: 700},          # Wrist up
+                        {4: 300, 5: 300},          # Wrist down
+                        {4: 500, 5: 500}           # Center
+                    ],
+                    "return": {4: 500, 5: 500}
+                }
+            },
+            # New complex movements
+            "figure_eight": {
+                "forward": {
+                    "sequence": [
+                        {1: 600, 2: 700, 3: 400, 4: 600},  # Top right
+                        {1: 400, 2: 700, 3: 600, 4: 400},  # Top left
+                        {1: 600, 2: 300, 3: 600, 4: 600},  # Bottom right
+                        {1: 400, 2: 300, 3: 400, 4: 400},  # Bottom left
+                        {1: 500, 2: 500, 3: 500, 4: 500}   # Center
+                    ],
+                    "return": {1: 500, 2: 500, 3: 500, 4: 500}
+                }
+            },
+            "cascade_flow": {
+                "forward": {
+                    "sequence": [
+                        {2: 700, 3: 500, 4: 500},  # Shoulder up
+                        {2: 500, 3: 700, 4: 500},  # Elbow up
+                        {2: 500, 3: 500, 4: 700},  # Wrist up
+                        {2: 300, 3: 500, 4: 500},  # Shoulder down
+                        {2: 500, 3: 300, 4: 500},  # Elbow down
+                        {2: 500, 3: 500, 4: 300}   # Wrist down
+                    ],
+                    "return": {2: 500, 3: 500, 4: 500}
+                }
+            },
+            "helix_spin": {
+                "forward": {
+                    "sequence": [
+                        {1: 600, 2: 700, 3: 400, 4: 600, 5: 700},  # Spiral up right
+                        {1: 400, 2: 700, 3: 600, 4: 400, 5: 300},  # Spiral up left
+                        {1: 600, 2: 300, 3: 600, 4: 600, 5: 700},  # Spiral down right
+                        {1: 400, 2: 300, 3: 400, 4: 400, 5: 300},  # Spiral down left
+                        {1: 500, 2: 500, 3: 500, 4: 500, 5: 500}   # Center
+                    ],
+                    "return": {1: 500, 2: 500, 3: 500, 4: 500, 5: 500}
+                }
+            },
+            "pendulum_swing": {
+                "forward": {
+                    "sequence": [
+                        {1: 700, 2: 600, 3: 400},  # Swing right
+                        {1: 300, 2: 600, 3: 600},  # Swing left
+                        {1: 700, 2: 400, 3: 400},  # Swing right low
+                        {1: 300, 2: 400, 3: 600},  # Swing left low
+                        {1: 500, 2: 500, 3: 500}   # Center
+                    ],
+                    "return": {1: 500, 2: 500, 3: 500}
+                }
+            },
+            "wave_cascade": {
+                "forward": {
+                    "sequence": [
+                        {2: 700, 3: 500, 4: 700, 5: 700},  # Wave up
+                        {2: 500, 3: 700, 4: 500, 5: 300},  # Wave middle
+                        {2: 300, 3: 500, 4: 300, 5: 700},  # Wave down
+                        {2: 500, 3: 300, 4: 500, 5: 300},  # Wave middle
+                        {2: 500, 3: 500, 4: 500, 5: 500}   # Center
+                    ],
+                    "return": {2: 500, 3: 500, 4: 500, 5: 500}
+                }
+            },
+            "energy_pulse": {
+                "forward": {
+                    "sequence": [
+                        {2: 700, 3: 700, 4: 700, 5: 700},  # Full extension
+                        {2: 300, 3: 300, 4: 300, 5: 300},  # Full contraction
+                        {2: 600, 3: 600, 4: 600, 5: 600},  # Mid extension
+                        {2: 400, 3: 400, 4: 400, 5: 400},  # Mid contraction
+                        {2: 500, 3: 500, 4: 500, 5: 500}   # Center
+                    ],
+                    "return": {2: 500, 3: 500, 4: 500, 5: 500}
+                }
             }
         }
+    
+    def _determine_movement_pattern(self, energy: float, brightness: float, roughness: float) -> str:
+        """Determine movement pattern based on audio features with more nuanced selection."""
+        if energy > 0.8 and roughness > 0.6:
+            return "energy_pulse"  # High energy, rough sound
+        elif energy > 0.7 and brightness > 0.6:
+            return "helix_spin"  # High energy, bright sound
+        elif energy > 0.6 and roughness > 0.5:
+            return "cascade_flow"  # Moderate energy, rough
+        elif energy > 0.6:
+            return "figure_eight"  # Moderate energy
+        elif brightness > 0.7:
+            return "wave_cascade"  # Bright sound
+        elif energy < 0.3:
+            return "pendulum_swing"  # Low energy
+        else:
+            return "snake_wave"  # Default to snake wave
+    
+    def _calculate_movement_duration(self, current_time: float, beat_times: np.ndarray, index: int, energy: float) -> float:
+        """Calculate movement duration based on energy level and pattern complexity."""
+        base_duration = 0.5  # Base duration in seconds
+        
+        if index < len(beat_times) - 1:
+            beat_interval = float(beat_times[index + 1] - current_time)
+            # Adjust duration based on energy level
+            if energy > 0.8:
+                return min(0.3, beat_interval)  # Faster movements for high energy
+            elif energy < 0.3:
+                return min(0.8, beat_interval)  # Slower movements for low energy
+            else:
+                return min(0.5, beat_interval)  # Medium speed for moderate energy
+        else:
+            return base_duration
     
     def generate_commands(self) -> List[Dict]:
         """Generate robot movement commands with synchronized arm movements."""
@@ -316,24 +445,33 @@ class MovementCommandGenerator:
             
             # Generate movement parameters
             movement_pattern = self._determine_movement_pattern(energy, brightness, roughness)
-            duration = min(0.5, self._calculate_movement_duration(beat_time, beat_times, i))
+            duration = self._calculate_movement_duration(beat_time, beat_times, i, energy)
             
             # Get arm positions for the pattern
             arm_positions = self.arm_positions[movement_pattern]
             
-            # Create forward movement command
-            forward_command = {
-                'timestamp': float(beat_time),
-                'movement_pattern': movement_pattern,
-                'duration': float(duration),
-                'energy_level': float(energy),
-                'brightness': float(brightness),
-                'beat_number': i + 1,
-                'arm_positions': arm_positions['forward'],
-                'movement_type': 'forward'
-            }
+            # Create sequence of movements
+            sequence = arm_positions["forward"]["sequence"]
+            return_pos = arm_positions["return"]
             
-            # Create return movement command
+            # Calculate duration for each movement in sequence
+            sequence_duration = duration / len(sequence)
+            
+            # Add forward movements
+            for j, pos in enumerate(sequence):
+                command = {
+                    'timestamp': float(beat_time + j * sequence_duration),
+                    'movement_pattern': movement_pattern,
+                    'duration': float(sequence_duration),
+                    'energy_level': float(energy),
+                    'brightness': float(brightness),
+                    'beat_number': i + 1,
+                    'arm_positions': pos,
+                    'movement_type': 'forward'
+                }
+                commands.append(command)
+            
+            # Add return movement
             return_command = {
                 'timestamp': float(beat_time + duration),
                 'movement_pattern': movement_pattern,
@@ -341,37 +479,12 @@ class MovementCommandGenerator:
                 'energy_level': float(energy),
                 'brightness': float(brightness),
                 'beat_number': i + 1,
-                'arm_positions': arm_positions['return'],
+                'arm_positions': return_pos,
                 'movement_type': 'return'
             }
-            
-            commands.extend([forward_command, return_command])
+            commands.append(return_command)
         
         return commands
-    
-    def _determine_movement_pattern(self, energy: float, brightness: float, roughness: float) -> str:
-        """Determine movement pattern based on audio features."""
-        if energy > 0.8 and roughness > 0.6:
-            return "aggressive_dance"
-        elif energy > 0.7:
-            return "energetic_spin"
-        elif brightness > 0.7:
-            return "spiral_right"
-        elif brightness < 0.3:
-            return "spiral_left"
-        elif energy > 0.5:
-            return "forward_groove"
-        elif roughness > 0.6:
-            return "shake_dance"
-        else:
-            return "gentle_sway"
-    
-    def _calculate_movement_duration(self, current_time: float, beat_times: np.ndarray, index: int) -> float:
-        """Calculate movement duration."""
-        if index < len(beat_times) - 1:
-            return max(0.1, float(beat_times[index + 1] - current_time))
-        else:
-            return Config.DEFAULT_MOVEMENT_DURATION
 
 
 class JetRoverController:
@@ -477,20 +590,19 @@ class JetRoverController:
         
         # Movement pattern implementations
         movement_methods = {
-            "aggressive_dance": self._aggressive_dance,
-            "energetic_spin": self._energetic_spin,
-            "spiral_right": lambda d: self._spiral_right(d),
-            "spiral_left": lambda d: self._spiral_left(d),
-            "forward_groove": self._forward_groove,
-            "shake_dance": self._shake_dance,
+            "snake_wave": self._snake_wave,
+            "energy_burst": self._energy_burst,
+            "gentle_sway": self._gentle_sway,
+            "spiral_motion": self._spiral_motion,
+            "wave_dance": self._wave_dance,
         }
         
         method = movement_methods.get(pattern, self._gentle_sway)
         method(duration)
     
-    def _aggressive_dance(self, duration: float):
-        """Aggressive dance movement."""
-        print(f"    🕺 AGGRESSIVE DANCE")
+    def _snake_wave(self, duration: float):
+        """Snake wave movement."""
+        print(f"    🐍 SNAKE WAVE")
         
         if duration > 0.4:
             movements = [(700, 0), (0, 700), (700, 700), (0, 0)]
@@ -502,44 +614,11 @@ class JetRoverController:
             self.send_wheel_command(700, 700, duration)
             time.sleep(duration)
     
-    def _energetic_spin(self, duration: float):
-        """Energetic spinning movement."""
-        print(f"    🌪️  ENERGETIC SPIN")
+    def _energy_burst(self, duration: float):
+        """Energy burst movement."""
+        print(f"    💥 ENERGY BURST")
         self.send_wheel_command(700, 0, duration)
         time.sleep(duration)
-    
-    def _spiral_right(self, duration: float):
-        """Spiral right movement."""
-        print(f"    ↗️  SPIRAL RIGHT")
-        self.send_wheel_command(700, int(700 * 0.3), duration)
-        time.sleep(duration)
-    
-    def _spiral_left(self, duration: float):
-        """Spiral left movement."""
-        print(f"    ↖️  SPIRAL LEFT")
-        self.send_wheel_command(int(700 * 0.3), 700, duration)
-        time.sleep(duration)
-    
-    def _forward_groove(self, duration: float):
-        """Forward grooving movement."""
-        print(f"    🚶 FORWARD GROOVE")
-        self.send_wheel_command(700, 700, duration)
-        time.sleep(duration)
-    
-    def _shake_dance(self, duration: float):
-        """Shaking dance movement."""
-        print(f"    🤝 SHAKE DANCE")
-        
-        if duration > 0.3:
-            shake_time = duration / 4
-            for _ in range(2):
-                self.send_wheel_command(700, 0, shake_time)
-                time.sleep(shake_time)
-                self.send_wheel_command(0, 700, shake_time)
-                time.sleep(shake_time)
-        else:
-            self.send_wheel_command(700, 700, duration)
-            time.sleep(duration)
     
     def _gentle_sway(self, duration: float):
         """Gentle swaying movement."""
@@ -553,6 +632,27 @@ class JetRoverController:
             time.sleep(half_time)
             self.send_wheel_command(int(avg_speed * 0.6), avg_speed, half_time)
             time.sleep(half_time)
+        else:
+            self.send_wheel_command(700, 700, duration)
+            time.sleep(duration)
+    
+    def _spiral_motion(self, duration: float):
+        """Spiral motion movement."""
+        print(f"    🌀 SPIRAL MOTION")
+        self.send_wheel_command(700, 0, duration)
+        time.sleep(duration)
+    
+    def _wave_dance(self, duration: float):
+        """Wave dance movement."""
+        print(f"    💃 WAVE DANCE")
+        
+        if duration > 0.3:
+            shake_time = duration / 4
+            for _ in range(2):
+                self.send_wheel_command(700, 0, shake_time)
+                time.sleep(shake_time)
+                self.send_wheel_command(0, 700, shake_time)
+                time.sleep(shake_time)
         else:
             self.send_wheel_command(700, 700, duration)
             time.sleep(duration)
@@ -669,7 +769,7 @@ class SynchronizedMovementExecutor:
             # Return to home position
             self.robot_controller.move_arm(self.robot_controller.home_position)
             self.robot_controller.safe_move_robot(0.0, 0.0, 0.1)
-            print("�� Dance complete!")
+            print("🎉 Dance complete!")
 
 
 class MusicDanceApplication:
