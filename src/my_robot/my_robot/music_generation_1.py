@@ -100,6 +100,33 @@ class MusicGenerator:
             "Content-Type": "application/json"
         }
     
+    def _convert_wav_to_mp3(self, wav_file: str) -> str:
+        """
+        Convert WAV file to MP3 format
+        
+        Args:
+            wav_file (str): Path to WAV file
+            
+        Returns:
+            str: Path to converted MP3 file
+        """
+        try:
+            # Create MP3 filename by replacing .wav with .mp3
+            mp3_file = wav_file.replace('.wav', '.mp3')
+            
+            # Load WAV file
+            audio = AudioSegment.from_wav(wav_file)
+            
+            # Export as MP3 with good quality
+            audio.export(mp3_file, format="mp3", bitrate="192k")
+            
+            print(f"✅ Converted to MP3: {mp3_file}")
+            return mp3_file
+            
+        except Exception as e:
+            print(f"❌ Error converting to MP3: {str(e)}")
+            return None
+    
     def generate_music(self, prompt: str, lyrics: str, output_file: str = Config.DEFAULT_OUTPUT_FILE) -> Optional[str]:
         """Generate music using Uberduck's API."""
         
@@ -126,7 +153,13 @@ class MusicGenerator:
             result = response.json()
             
             if 'output_url' in result:
-                return self._download_audio(result['output_url'], output_file)
+                wav_file = self._download_audio(result['output_url'], output_file)
+                if wav_file:
+                    # Convert WAV to MP3
+                    mp3_file = self._convert_wav_to_mp3(wav_file)
+                    if mp3_file:
+                        return mp3_file  # Return MP3 file path
+                    return wav_file  # Fallback to WAV if conversion fails
             else:
                 print("❌ No audio URL in response")
                 print(f"Response: {result}")
