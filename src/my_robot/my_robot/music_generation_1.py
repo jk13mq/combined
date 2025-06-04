@@ -254,14 +254,14 @@ class MovementCommandGenerator:
     
     def __init__(self, analyzer: AudioAnalyzer):
         self.analyzer = analyzer
-        # Define more complex arm positions for different movement patterns
+        # Define safer arm positions with smoother transitions
         self.arm_positions = {
             "snake_wave": {
                 "forward": {
                     "sequence": [
-                        {2: 700, 3: 400, 4: 600},  # Wave up
-                        {2: 400, 3: 700, 4: 400},  # Wave down
-                        {2: 600, 3: 500, 4: 700}   # Wave middle
+                        {2: 550, 3: 500, 4: 550},  # Slight up
+                        {2: 500, 3: 550, 4: 500},  # Slight down
+                        {2: 550, 3: 500, 4: 550}   # Slight up
                     ]
                 },
                 "return": {2: 500, 3: 500, 4: 500}  # Home position
@@ -269,9 +269,9 @@ class MovementCommandGenerator:
             "energy_burst": {
                 "forward": {
                     "sequence": [
-                        {2: 700, 3: 700, 4: 700},  # Full extension
-                        {2: 300, 3: 300, 4: 300},  # Full contraction
-                        {2: 600, 3: 600, 4: 600}   # Mid position
+                        {2: 600, 3: 600, 4: 600},  # Moderate extension
+                        {2: 400, 3: 400, 4: 400},  # Moderate contraction
+                        {2: 500, 3: 500, 4: 500}   # Center
                     ]
                 },
                 "return": {2: 500, 3: 500, 4: 500}
@@ -279,8 +279,8 @@ class MovementCommandGenerator:
             "gentle_sway": {
                 "forward": {
                     "sequence": [
-                        {2: 550, 3: 450, 4: 550},  # Slight up
-                        {2: 450, 3: 550, 4: 450},  # Slight down
+                        {2: 550, 3: 450, 4: 550},  # Very slight up
+                        {2: 450, 3: 550, 4: 450},  # Very slight down
                         {2: 500, 3: 500, 4: 500}   # Center
                     ]
                 },
@@ -289,8 +289,8 @@ class MovementCommandGenerator:
             "spiral_motion": {
                 "forward": {
                     "sequence": [
-                        {1: 600, 2: 700, 3: 400},  # Spiral up
-                        {1: 400, 2: 300, 3: 600},  # Spiral down
+                        {1: 550, 2: 600, 3: 450},  # Gentle spiral up
+                        {1: 450, 2: 400, 3: 550},  # Gentle spiral down
                         {1: 500, 2: 500, 3: 500}   # Center
                     ]
                 },
@@ -299,8 +299,8 @@ class MovementCommandGenerator:
             "wave_dance": {
                 "forward": {
                     "sequence": [
-                        {4: 700, 5: 700},          # Wrist up
-                        {4: 300, 5: 300},          # Wrist down
+                        {4: 600, 5: 600},          # Gentle wrist up
+                        {4: 400, 5: 400},          # Gentle wrist down
                         {4: 500, 5: 500}           # Center
                     ]
                 },
@@ -309,10 +309,10 @@ class MovementCommandGenerator:
             "figure_eight": {
                 "forward": {
                     "sequence": [
-                        {1: 600, 2: 700, 3: 400, 4: 600},  # Top right
-                        {1: 400, 2: 700, 3: 600, 4: 400},  # Top left
-                        {1: 600, 2: 300, 3: 600, 4: 600},  # Bottom right
-                        {1: 400, 2: 300, 3: 400, 4: 400},  # Bottom left
+                        {1: 550, 2: 600, 3: 450, 4: 550},  # Top right
+                        {1: 450, 2: 600, 3: 550, 4: 450},  # Top left
+                        {1: 550, 2: 400, 3: 550, 4: 550},  # Bottom right
+                        {1: 450, 2: 400, 3: 450, 4: 450},  # Bottom left
                         {1: 500, 2: 500, 3: 500, 4: 500}   # Center
                     ]
                 },
@@ -321,12 +321,12 @@ class MovementCommandGenerator:
             "cascade_flow": {
                 "forward": {
                     "sequence": [
-                        {2: 700, 3: 500, 4: 500},  # Shoulder up
-                        {2: 500, 3: 700, 4: 500},  # Elbow up
-                        {2: 500, 3: 500, 4: 700},  # Wrist up
-                        {2: 300, 3: 500, 4: 500},  # Shoulder down
-                        {2: 500, 3: 300, 4: 500},  # Elbow down
-                        {2: 500, 3: 500, 4: 300}   # Wrist down
+                        {2: 600, 3: 500, 4: 500},  # Shoulder up
+                        {2: 500, 3: 600, 4: 500},  # Elbow up
+                        {2: 500, 3: 500, 4: 600},  # Wrist up
+                        {2: 400, 3: 500, 4: 500},  # Shoulder down
+                        {2: 500, 3: 400, 4: 500},  # Elbow down
+                        {2: 500, 3: 500, 4: 400}   # Wrist down
                     ]
                 },
                 "return": {2: 500, 3: 500, 4: 500}
@@ -334,10 +334,10 @@ class MovementCommandGenerator:
             "helix_spin": {
                 "forward": {
                     "sequence": [
-                        {1: 600, 2: 700, 3: 400, 4: 600, 5: 700},  # Spiral up right
-                        {1: 400, 2: 700, 3: 600, 4: 400, 5: 300},  # Spiral up left
-                        {1: 600, 2: 300, 3: 600, 4: 600, 5: 700},  # Spiral down right
-                        {1: 400, 2: 300, 3: 400, 4: 400, 5: 300},  # Spiral down left
+                        {1: 550, 2: 600, 3: 450, 4: 550, 5: 600},  # Spiral up right
+                        {1: 450, 2: 600, 3: 550, 4: 450, 5: 400},  # Spiral up left
+                        {1: 550, 2: 400, 3: 550, 4: 550, 5: 600},  # Spiral down right
+                        {1: 450, 2: 400, 3: 450, 4: 450, 5: 400},  # Spiral down left
                         {1: 500, 2: 500, 3: 500, 4: 500, 5: 500}   # Center
                     ]
                 },
@@ -346,10 +346,10 @@ class MovementCommandGenerator:
             "pendulum_swing": {
                 "forward": {
                     "sequence": [
-                        {1: 700, 2: 600, 3: 400},  # Swing right
-                        {1: 300, 2: 600, 3: 600},  # Swing left
-                        {1: 700, 2: 400, 3: 400},  # Swing right low
-                        {1: 300, 2: 400, 3: 600},  # Swing left low
+                        {1: 600, 2: 550, 3: 450},  # Swing right
+                        {1: 400, 2: 550, 3: 550},  # Swing left
+                        {1: 600, 2: 450, 3: 450},  # Swing right low
+                        {1: 400, 2: 450, 3: 550},  # Swing left low
                         {1: 500, 2: 500, 3: 500}   # Center
                     ]
                 },
@@ -358,10 +358,10 @@ class MovementCommandGenerator:
             "wave_cascade": {
                 "forward": {
                     "sequence": [
-                        {2: 700, 3: 500, 4: 700, 5: 700},  # Wave up
-                        {2: 500, 3: 700, 4: 500, 5: 300},  # Wave middle
-                        {2: 300, 3: 500, 4: 300, 5: 700},  # Wave down
-                        {2: 500, 3: 300, 4: 500, 5: 300},  # Wave middle
+                        {2: 600, 3: 500, 4: 600, 5: 600},  # Wave up
+                        {2: 500, 3: 600, 4: 500, 5: 400},  # Wave middle
+                        {2: 400, 3: 500, 4: 400, 5: 600},  # Wave down
+                        {2: 500, 3: 400, 4: 500, 5: 400},  # Wave middle
                         {2: 500, 3: 500, 4: 500, 5: 500}   # Center
                     ]
                 },
@@ -370,10 +370,10 @@ class MovementCommandGenerator:
             "energy_pulse": {
                 "forward": {
                     "sequence": [
-                        {2: 700, 3: 700, 4: 700, 5: 700},  # Full extension
-                        {2: 300, 3: 300, 4: 300, 5: 300},  # Full contraction
-                        {2: 600, 3: 600, 4: 600, 5: 600},  # Mid extension
-                        {2: 400, 3: 400, 4: 400, 5: 400},  # Mid contraction
+                        {2: 600, 3: 600, 4: 600, 5: 600},  # Moderate extension
+                        {2: 400, 3: 400, 4: 400, 5: 400},  # Moderate contraction
+                        {2: 550, 3: 550, 4: 550, 5: 550},  # Slight extension
+                        {2: 450, 3: 450, 4: 450, 5: 450},  # Slight contraction
                         {2: 500, 3: 500, 4: 500, 5: 500}   # Center
                     ]
                 },
@@ -400,17 +400,17 @@ class MovementCommandGenerator:
     
     def _calculate_movement_duration(self, current_time: float, beat_times: np.ndarray, index: int, energy: float) -> float:
         """Calculate movement duration based on energy level and pattern complexity."""
-        base_duration = 0.5  # Base duration in seconds
+        base_duration = 0.8  # Increased base duration for smoother movements
         
         if index < len(beat_times) - 1:
             beat_interval = float(beat_times[index + 1] - current_time)
-            # Adjust duration based on energy level
+            # Adjust duration based on energy level, but keep movements smooth
             if energy > 0.8:
-                return min(0.3, beat_interval)  # Faster movements for high energy
+                return min(0.6, beat_interval)  # Faster but still smooth for high energy
             elif energy < 0.3:
-                return min(0.8, beat_interval)  # Slower movements for low energy
+                return min(1.0, beat_interval)  # Slower movements for low energy
             else:
-                return min(0.5, beat_interval)  # Medium speed for moderate energy
+                return min(0.8, beat_interval)  # Medium speed for moderate energy
         else:
             return base_duration
     
