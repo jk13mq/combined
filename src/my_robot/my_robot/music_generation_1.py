@@ -33,7 +33,7 @@ class Config:
     """Configuration settings for the music generation pipeline."""
     
     # API Keys and URLs
-    OPENAI_API_KEY = "sk-proj-"
+    OPENAI_API_KEY = ""
     UBERDUCK_API_KEY = ""
     
     # API endpoints
@@ -250,13 +250,44 @@ class AudioAnalyzer:
 
 
 class MovementCommandGenerator:
-    """Generates movement commands for Jet Rover based on audio analysis."""
+    """Generates movement commands for robot based on audio analysis."""
     
     def __init__(self, analyzer: AudioAnalyzer):
         self.analyzer = analyzer
+        # Define arm positions for different movement patterns
+        self.arm_positions = {
+            "aggressive_dance": {
+                "forward": {2: 700, 3: 600, 4: 500},  # Raised position
+                "return": {2: 300, 3: 400, 4: 700}    # Lowered position
+            },
+            "energetic_spin": {
+                "forward": {1: 600, 2: 700, 3: 500},  # Extended position
+                "return": {1: 400, 2: 300, 3: 600}    # Retracted position
+            },
+            "spiral_right": {
+                "forward": {1: 600, 2: 700, 3: 400},  # Right extended
+                "return": {1: 400, 2: 300, 3: 600}    # Left retracted
+            },
+            "spiral_left": {
+                "forward": {1: 400, 2: 700, 3: 600},  # Left extended
+                "return": {1: 600, 2: 300, 3: 400}    # Right retracted
+            },
+            "forward_groove": {
+                "forward": {2: 700, 3: 700, 4: 500},  # Raised position
+                "return": {2: 300, 3: 300, 4: 700}    # Lowered position
+            },
+            "shake_dance": {
+                "forward": {4: 700, 5: 700},          # Wrist up
+                "return": {4: 300, 5: 300}            # Wrist down
+            },
+            "gentle_sway": {
+                "forward": {2: 600, 3: 500, 4: 500},  # Gentle raise
+                "return": {2: 400, 3: 500, 4: 500}    # Gentle lower
+            }
+        }
     
     def generate_commands(self) -> List[Dict]:
-        """Generate Jet Rover specific movement commands."""
+        """Generate robot movement commands with synchronized arm movements."""
         tempo, beat_times = self.analyzer.extract_beats()
         
         if len(beat_times) == 0:
@@ -279,47 +310,44 @@ class MovementCommandGenerator:
                 brightness = norm_spectral[feature_idx]
                 roughness = norm_zcr[feature_idx]
             else:
-                # Use defaults if no features available
                 energy = 0.5 + 0.3 * np.sin(i * 0.5)
                 brightness = 0.5 + 0.2 * np.cos(i * 0.3)
                 roughness = 0.5
             
             # Generate movement parameters
-            left_speed, right_speed = self._calculate_wheel_speeds(energy, brightness, tempo)
             movement_pattern = self._determine_movement_pattern(energy, brightness, roughness)
-            duration = self._calculate_movement_duration(beat_time, beat_times, i)
+            duration = min(0.5, self._calculate_movement_duration(beat_time, beat_times, i))
             
-            command = {
+            # Get arm positions for the pattern
+            arm_positions = self.arm_positions[movement_pattern]
+            
+            # Create forward movement command
+            forward_command = {
                 'timestamp': float(beat_time),
                 'movement_pattern': movement_pattern,
-                'left_wheel_speed': int(left_speed),
-                'right_wheel_speed': int(right_speed),
                 'duration': float(duration),
                 'energy_level': float(energy),
                 'brightness': float(brightness),
-                'beat_number': i + 1
+                'beat_number': i + 1,
+                'arm_positions': arm_positions['forward'],
+                'movement_type': 'forward'
             }
             
-            commands.append(command)
+            # Create return movement command
+            return_command = {
+                'timestamp': float(beat_time + duration),
+                'movement_pattern': movement_pattern,
+                'duration': float(duration),
+                'energy_level': float(energy),
+                'brightness': float(brightness),
+                'beat_number': i + 1,
+                'arm_positions': arm_positions['return'],
+                'movement_type': 'return'
+            }
+            
+            commands.extend([forward_command, return_command])
         
         return commands
-    
-    def _calculate_wheel_speeds(self, energy: float, brightness: float, tempo: float) -> Tuple[int, int]:
-        """Calculate left and right wheel speeds for Jet Rover."""
-        base_speed = min(Config.MAX_SPEED, max(Config.MIN_SPEED, int(tempo * 1.5 * (0.3 + energy * 0.7))))
-        
-        if brightness > 0.65:  # High frequency = turn right
-            left_speed = base_speed
-            right_speed = int(base_speed * 0.2)
-        elif brightness < 0.35:  # Low frequency = turn left
-            left_speed = int(base_speed * 0.2)
-            right_speed = base_speed
-        else:  # Medium frequency = go straight or gentle turn
-            speed_diff = int((brightness - 0.5) * base_speed * 0.6)
-            left_speed = max(0, min(Config.MAX_SPEED, base_speed - speed_diff))
-            right_speed = max(0, min(Config.MAX_SPEED, base_speed + speed_diff))
-        
-        return left_speed, right_speed
     
     def _determine_movement_pattern(self, energy: float, brightness: float, roughness: float) -> str:
         """Determine movement pattern based on audio features."""
@@ -443,8 +471,6 @@ class JetRoverController:
     def _execute_movement_pattern(self, command: Dict):
         """Execute specific movement pattern."""
         pattern = command['movement_pattern']
-        left_speed = command['left_wheel_speed']
-        right_speed = command['right_wheel_speed']
         duration = command['duration']
         
         print(f"⏰ Beat {command['beat_number']} ({command['timestamp']:.1f}s): {pattern.upper()}")
@@ -453,85 +479,82 @@ class JetRoverController:
         movement_methods = {
             "aggressive_dance": self._aggressive_dance,
             "energetic_spin": self._energetic_spin,
-            "spiral_right": lambda ls, rs, d: self._spiral_right(ls, d),
-            "spiral_left": lambda ls, rs, d: self._spiral_left(rs, d),
+            "spiral_right": lambda d: self._spiral_right(d),
+            "spiral_left": lambda d: self._spiral_left(d),
             "forward_groove": self._forward_groove,
             "shake_dance": self._shake_dance,
         }
         
         method = movement_methods.get(pattern, self._gentle_sway)
-        method(left_speed, right_speed, duration)
+        method(duration)
     
-    def _aggressive_dance(self, left_speed: int, right_speed: int, duration: float):
+    def _aggressive_dance(self, duration: float):
         """Aggressive dance movement."""
         print(f"    🕺 AGGRESSIVE DANCE")
         
         if duration > 0.4:
-            movements = [(left_speed, 0), (0, right_speed), (left_speed, right_speed), (0, 0)]
+            movements = [(700, 0), (0, 700), (700, 700), (0, 0)]
             segment_time = duration / len(movements)
             for left, right in movements:
                 self.send_wheel_command(left, right, segment_time)
                 time.sleep(segment_time)
         else:
-            self.send_wheel_command(left_speed, right_speed, duration)
+            self.send_wheel_command(700, 700, duration)
             time.sleep(duration)
     
-    def _energetic_spin(self, left_speed: int, right_speed: int, duration: float):
+    def _energetic_spin(self, duration: float):
         """Energetic spinning movement."""
         print(f"    🌪️  ENERGETIC SPIN")
-        if left_speed > right_speed:
-            self.send_wheel_command(left_speed, 0, duration)
-        else:
-            self.send_wheel_command(0, right_speed, duration)
+        self.send_wheel_command(700, 0, duration)
         time.sleep(duration)
     
-    def _spiral_right(self, speed: int, duration: float):
+    def _spiral_right(self, duration: float):
         """Spiral right movement."""
         print(f"    ↗️  SPIRAL RIGHT")
-        self.send_wheel_command(speed, int(speed * 0.3), duration)
+        self.send_wheel_command(700, int(700 * 0.3), duration)
         time.sleep(duration)
     
-    def _spiral_left(self, speed: int, duration: float):
+    def _spiral_left(self, duration: float):
         """Spiral left movement."""
         print(f"    ↖️  SPIRAL LEFT")
-        self.send_wheel_command(int(speed * 0.3), speed, duration)
+        self.send_wheel_command(int(700 * 0.3), 700, duration)
         time.sleep(duration)
     
-    def _forward_groove(self, left_speed: int, right_speed: int, duration: float):
+    def _forward_groove(self, duration: float):
         """Forward grooving movement."""
         print(f"    🚶 FORWARD GROOVE")
-        self.send_wheel_command(left_speed, right_speed, duration)
+        self.send_wheel_command(700, 700, duration)
         time.sleep(duration)
     
-    def _shake_dance(self, left_speed: int, right_speed: int, duration: float):
+    def _shake_dance(self, duration: float):
         """Shaking dance movement."""
         print(f"    🤝 SHAKE DANCE")
         
         if duration > 0.3:
             shake_time = duration / 4
             for _ in range(2):
-                self.send_wheel_command(left_speed, 0, shake_time)
+                self.send_wheel_command(700, 0, shake_time)
                 time.sleep(shake_time)
-                self.send_wheel_command(0, right_speed, shake_time)
+                self.send_wheel_command(0, 700, shake_time)
                 time.sleep(shake_time)
         else:
-            self.send_wheel_command(left_speed, right_speed, duration)
+            self.send_wheel_command(700, 700, duration)
             time.sleep(duration)
     
-    def _gentle_sway(self, left_speed: int, right_speed: int, duration: float):
+    def _gentle_sway(self, duration: float):
         """Gentle swaying movement."""
         print(f"    🌊 GENTLE SWAY")
         
         if duration > 0.4:
             half_time = duration / 2
-            avg_speed = (left_speed + right_speed) // 2
+            avg_speed = 600
             
             self.send_wheel_command(avg_speed, int(avg_speed * 0.6), half_time)
             time.sleep(half_time)
             self.send_wheel_command(int(avg_speed * 0.6), avg_speed, half_time)
             time.sleep(half_time)
         else:
-            self.send_wheel_command(left_speed, right_speed, duration)
+            self.send_wheel_command(700, 700, duration)
             time.sleep(duration)
 
 
@@ -556,9 +579,9 @@ class Utils:
         if not commands:
             return
             
-        print(f"\n📊 Jet Rover Dance Summary:")
+        print(f"\n📊 Robot Dance Summary:")
         print(f"Duration: {commands[-1]['timestamp']:.2f} seconds")
-        print(f"Total beats: {len(commands)}")
+        print(f"Total movements: {len(commands)}")
         print(f"Tempo: {tempo:.2f} BPM")
         
         # Movement pattern distribution
@@ -581,7 +604,72 @@ class Utils:
         print(f"\n🎯 First 5 Movement Commands:")
         for i, cmd in enumerate(commands[:5]):
             print(f"  {i+1}. {cmd['timestamp']:.1f}s: {cmd['movement_pattern']} "
-                  f"(L:{cmd['left_wheel_speed']}, R:{cmd['right_wheel_speed']})")
+                  f"({cmd['movement_type']}) - Arm: {cmd['arm_positions']}")
+
+
+class SynchronizedMovementExecutor:
+    """Executes synchronized arm and base movements based on music analysis."""
+    
+    def __init__(self, robot_controller):
+        self.robot_controller = robot_controller
+        self.movement_queue = []
+    
+    def load_commands(self, commands: List[Dict]):
+        """Load movement commands."""
+        self.movement_queue = commands
+        print(f"📥 Loaded {len(commands)} movement commands")
+    
+    def execute_synchronized_dance(self, start_delay: int = 3):
+        """Execute synchronized dance with audio."""
+        if not self.movement_queue:
+            print("❌ No commands to execute")
+            return
+            
+        print(f"🎭 Starting synchronized dance in {start_delay} seconds...")
+        for i in range(start_delay, 0, -1):
+            print(f"    {i}...")
+            time.sleep(1)
+        
+        print("🎵 DANCE STARTED! 🎵")
+        start_time = time.time()
+        
+        try:
+            for command in self.movement_queue:
+                target_time = start_time + command['timestamp']
+                current_time = time.time()
+                
+                if current_time < target_time:
+                    time.sleep(target_time - current_time)
+                
+                # Execute arm movement
+                self.robot_controller.move_arm(
+                    command['arm_positions'],
+                    command['duration']
+                )
+                
+                # Execute base movement
+                if command['movement_type'] == 'forward':
+                    self.robot_controller.safe_move_robot(
+                        0.2,  # linear_speed
+                        0.1,  # angular_speed
+                        command['duration']
+                    )
+                else:  # return movement
+                    self.robot_controller.safe_move_robot(
+                        -0.2,  # linear_speed
+                        -0.1,  # angular_speed
+                        command['duration']
+                    )
+                
+        except KeyboardInterrupt:
+            print("\n⏹️  Dance interrupted by user")
+        except Exception as e:
+            print(f"\n❌ Dance error: {e}")
+        finally:
+            # Return to home position
+            self.robot_controller.move_arm(self.robot_controller.home_position)
+            self.robot_controller.safe_move_robot(0.0, 0.0, 0.1)
+            print("�� Dance complete!")
 
 
 class MusicDanceApplication:
@@ -669,12 +757,13 @@ class MusicDanceApplication:
         """Set up and execute dance performance."""
         # Hardware connection setup
         rover = self._setup_rover_connection()
-        rover.load_movement_commands(commands)
+        executor = SynchronizedMovementExecutor(rover)
+        executor.load_commands(commands)
         
         # Execute dance
         execute = input("\n🎵 Start the dance performance? (y/n): ").lower() == 'y'
         if execute:
-            rover.execute_synchronized_dance()
+            executor.execute_synchronized_dance()
     
     def _setup_rover_connection(self) -> JetRoverController:
         """Set up Jet Rover connection."""
