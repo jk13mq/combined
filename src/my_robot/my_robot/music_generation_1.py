@@ -262,9 +262,9 @@ class MovementCommandGenerator:
                         {2: 700, 3: 400, 4: 600},  # Wave up
                         {2: 400, 3: 700, 4: 400},  # Wave down
                         {2: 600, 3: 500, 4: 700}   # Wave middle
-                    ],
-                    "return": {2: 500, 3: 500, 4: 500}
-                }
+                    ]
+                },
+                "return": {2: 500, 3: 500, 4: 500}  # Home position
             },
             "energy_burst": {
                 "forward": {
@@ -272,9 +272,9 @@ class MovementCommandGenerator:
                         {2: 700, 3: 700, 4: 700},  # Full extension
                         {2: 300, 3: 300, 4: 300},  # Full contraction
                         {2: 600, 3: 600, 4: 600}   # Mid position
-                    ],
-                    "return": {2: 500, 3: 500, 4: 500}
-                }
+                    ]
+                },
+                "return": {2: 500, 3: 500, 4: 500}
             },
             "gentle_sway": {
                 "forward": {
@@ -282,9 +282,9 @@ class MovementCommandGenerator:
                         {2: 550, 3: 450, 4: 550},  # Slight up
                         {2: 450, 3: 550, 4: 450},  # Slight down
                         {2: 500, 3: 500, 4: 500}   # Center
-                    ],
-                    "return": {2: 500, 3: 500, 4: 500}
-                }
+                    ]
+                },
+                "return": {2: 500, 3: 500, 4: 500}
             },
             "spiral_motion": {
                 "forward": {
@@ -292,9 +292,9 @@ class MovementCommandGenerator:
                         {1: 600, 2: 700, 3: 400},  # Spiral up
                         {1: 400, 2: 300, 3: 600},  # Spiral down
                         {1: 500, 2: 500, 3: 500}   # Center
-                    ],
-                    "return": {1: 500, 2: 500, 3: 500}
-                }
+                    ]
+                },
+                "return": {1: 500, 2: 500, 3: 500}
             },
             "wave_dance": {
                 "forward": {
@@ -302,11 +302,10 @@ class MovementCommandGenerator:
                         {4: 700, 5: 700},          # Wrist up
                         {4: 300, 5: 300},          # Wrist down
                         {4: 500, 5: 500}           # Center
-                    ],
-                    "return": {4: 500, 5: 500}
-                }
+                    ]
+                },
+                "return": {4: 500, 5: 500}
             },
-            # New complex movements
             "figure_eight": {
                 "forward": {
                     "sequence": [
@@ -315,9 +314,9 @@ class MovementCommandGenerator:
                         {1: 600, 2: 300, 3: 600, 4: 600},  # Bottom right
                         {1: 400, 2: 300, 3: 400, 4: 400},  # Bottom left
                         {1: 500, 2: 500, 3: 500, 4: 500}   # Center
-                    ],
-                    "return": {1: 500, 2: 500, 3: 500, 4: 500}
-                }
+                    ]
+                },
+                "return": {1: 500, 2: 500, 3: 500, 4: 500}
             },
             "cascade_flow": {
                 "forward": {
@@ -328,9 +327,9 @@ class MovementCommandGenerator:
                         {2: 300, 3: 500, 4: 500},  # Shoulder down
                         {2: 500, 3: 300, 4: 500},  # Elbow down
                         {2: 500, 3: 500, 4: 300}   # Wrist down
-                    ],
-                    "return": {2: 500, 3: 500, 4: 500}
-                }
+                    ]
+                },
+                "return": {2: 500, 3: 500, 4: 500}
             },
             "helix_spin": {
                 "forward": {
@@ -340,9 +339,9 @@ class MovementCommandGenerator:
                         {1: 600, 2: 300, 3: 600, 4: 600, 5: 700},  # Spiral down right
                         {1: 400, 2: 300, 3: 400, 4: 400, 5: 300},  # Spiral down left
                         {1: 500, 2: 500, 3: 500, 4: 500, 5: 500}   # Center
-                    ],
-                    "return": {1: 500, 2: 500, 3: 500, 4: 500, 5: 500}
-                }
+                    ]
+                },
+                "return": {1: 500, 2: 500, 3: 500, 4: 500, 5: 500}
             },
             "pendulum_swing": {
                 "forward": {
@@ -352,9 +351,9 @@ class MovementCommandGenerator:
                         {1: 700, 2: 400, 3: 400},  # Swing right low
                         {1: 300, 2: 400, 3: 600},  # Swing left low
                         {1: 500, 2: 500, 3: 500}   # Center
-                    ],
-                    "return": {1: 500, 2: 500, 3: 500}
-                }
+                    ]
+                },
+                "return": {1: 500, 2: 500, 3: 500}
             },
             "wave_cascade": {
                 "forward": {
@@ -364,9 +363,9 @@ class MovementCommandGenerator:
                         {2: 300, 3: 500, 4: 300, 5: 700},  # Wave down
                         {2: 500, 3: 300, 4: 500, 5: 300},  # Wave middle
                         {2: 500, 3: 500, 4: 500, 5: 500}   # Center
-                    ],
-                    "return": {2: 500, 3: 500, 4: 500, 5: 500}
-                }
+                    ]
+                },
+                "return": {2: 500, 3: 500, 4: 500, 5: 500}
             },
             "energy_pulse": {
                 "forward": {
@@ -376,9 +375,9 @@ class MovementCommandGenerator:
                         {2: 600, 3: 600, 4: 600, 5: 600},  # Mid extension
                         {2: 400, 3: 400, 4: 400, 5: 400},  # Mid contraction
                         {2: 500, 3: 500, 4: 500, 5: 500}   # Center
-                    ],
-                    "return": {2: 500, 3: 500, 4: 500, 5: 500}
-                }
+                    ]
+                },
+                "return": {2: 500, 3: 500, 4: 500, 5: 500}
             }
         }
     
