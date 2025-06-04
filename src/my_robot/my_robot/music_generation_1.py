@@ -382,47 +382,36 @@ class MovementCommandGenerator:
         }
     
     def _determine_movement_pattern(self, energy: float, brightness: float, roughness: float) -> str:
-        """Determine movement pattern based on audio features with more granular selection."""
-        # Energy bins (0.0 to 1.0)
-        if energy > 0.9:
-            if roughness > 0.7:
-                return "energy_pulse"  # Very high energy, very rough
-            elif brightness > 0.7:
-                return "helix_spin"    # Very high energy, very bright
-            else:
-                return "cascade_flow"  # Very high energy, moderate features
+        """Determine movement pattern based on audio features with more even distribution."""
+        # Create a more balanced distribution by using modulo operation on beat number
+        # This ensures each pattern gets roughly equal representation
+        beat_number = int(energy * 1000) % 5  # Use energy to create variation but maintain even distribution
         
-        elif energy > 0.7:
-            if roughness > 0.6:
-                return "wave_cascade"  # High energy, rough
-            elif brightness > 0.6:
-                return "figure_eight"  # High energy, bright
-            else:
-                return "cascade_flow"  # High energy, moderate features
+        # Map beat number to movement patterns
+        pattern_map = {
+            0: "cascade_flow",    # ~20%
+            1: "gentle_sway",     # ~20%
+            2: "pendulum_swing",  # ~20%
+            3: "snake_wave",      # ~20%
+            4: "wave_dance"       # ~20%
+        }
         
-        elif energy > 0.5:
-            if roughness > 0.5:
-                return "snake_wave"    # Moderate energy, rough
-            elif brightness > 0.5:
-                return "pendulum_swing"  # Moderate energy, bright
+        # Add some variation based on audio features while maintaining balance
+        if energy > 0.8 and roughness > 0.7:
+            # High energy and roughness might trigger special patterns
+            if beat_number % 2 == 0:
+                return "cascade_flow"
             else:
-                return "gentle_sway"   # Moderate energy, moderate features
+                return "wave_dance"
+        elif energy < 0.3 and brightness < 0.3:
+            # Low energy and brightness might favor gentler patterns
+            if beat_number % 2 == 0:
+                return "gentle_sway"
+            else:
+                return "snake_wave"
         
-        elif energy > 0.3:
-            if roughness > 0.4:
-                return "wave_dance"    # Low energy, rough
-            elif brightness > 0.4:
-                return "pendulum_swing"  # Low energy, bright
-            else:
-                return "gentle_sway"   # Low energy, moderate features
-        
-        else:  # energy <= 0.3
-            if roughness > 0.3:
-                return "snake_wave"    # Very low energy, rough
-            elif brightness > 0.3:
-                return "pendulum_swing"  # Very low energy, bright
-            else:
-                return "gentle_sway"   # Very low energy, moderate features
+        # Default to the evenly distributed pattern
+        return pattern_map[beat_number]
     
     def _calculate_movement_duration(self, current_time: float, beat_times: np.ndarray, index: int, energy: float) -> float:
         """Calculate movement duration based on energy level and pattern complexity."""
