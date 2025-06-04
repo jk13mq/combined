@@ -68,7 +68,8 @@ class RobotController(Node):
         
         for joint_id, position in joint_positions.items():
             servo = ServoPosition()
-            servo.id = joint_id
+            # Convert joint_id to integer
+            servo.id = int(joint_id)
             servo.position = float(position)
             msg.position.append(servo)
             
