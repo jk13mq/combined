@@ -30,6 +30,7 @@ except ImportError:
 
 # Configuration
 class Config:
+    
     """Configuration settings for the music generation pipeline."""
     
     # API Keys and URLs
