@@ -174,11 +174,25 @@ class RobotController(Node):
                 # Execute arm movement
                 self.move_arm(command['arm_positions'], command['duration'])
                 
-                # Execute base movement
+                # Execute base movement with strafing
                 if command['movement_type'] == 'forward':
-                    self.safe_move_robot(0.2, 0.1, command['duration'])
-                else:  # return movement
-                    self.safe_move_robot(-0.2, -0.1, command['duration'])
+                    # Add strafing based on energy level and beat number
+                    if command['energy_level'] > 0.7 and command['beat_number'] % 4 == 0:
+                        # High energy and every 4th beat - do a quick strafe
+                        self.strafe_robot('left' if command['beat_number'] % 8 < 4 else 'right', 
+                                        speed=0.3, 
+                                        duration=command['duration'] * 0.5)
+                    else:
+                        self.safe_move_robot(0.2, 0.1, command['duration'])
+                elif command['movement_type'] == 'return':
+                    # Add strafing to return movements based on brightness
+                    if command['brightness'] > 0.7 and command['beat_number'] % 3 == 0:
+                        # High brightness and every 3rd beat - do a gentle strafe
+                        self.strafe_robot('right' if command['beat_number'] % 6 < 3 else 'left',
+                                        speed=0.2,
+                                        duration=command['duration'] * 0.5)
+                    else:
+                        self.safe_move_robot(-0.2, -0.1, command['duration'])
                 
                 self.get_logger().info(
                     f"Executed {command['movement_pattern']} "
@@ -210,6 +224,46 @@ class RobotController(Node):
             # Ensure we return to home position
             self.move_arm(self.home_position)
             self.safe_move_robot(0.0, 0.0, 0.1)
+
+    def strafe_robot(self, direction: str, speed: float = 0.2, duration: float = 0.5):
+        """
+        Move the robot sideways (strafing) without forward/backward motion.
+        
+        Args:
+            direction (str): 'left' or 'right' for strafing direction
+            speed (float): Strafing speed in m/s (default: 0.2)
+            duration (float): Time to move in seconds (default: 0.5)
+        """
+        # Cap duration at 0.5 seconds
+        duration = min(duration, 0.5)
+        
+        # Create twist message for strafing
+        twist = Twist()
+        if direction.lower() == 'left':
+            twist.linear.y = speed  # Positive Y for left strafe
+        elif direction.lower() == 'right':
+            twist.linear.y = -speed  # Negative Y for right strafe
+        else:
+            self.get_logger().error(f"Invalid direction: {direction}. Use 'left' or 'right'")
+            return
+        
+        # Execute strafing movement
+        end_time = time.time() + duration
+        while time.time() < end_time and rclpy.ok():
+            self.movement_publisher.publish(twist)
+            time.sleep(0.1)
+        
+        # Return movement
+        twist.linear.y = -twist.linear.y
+        end_time = time.time() + duration
+        while time.time() < end_time and rclpy.ok():
+            self.movement_publisher.publish(twist)
+            time.sleep(0.1)
+        
+        # Stop the robot
+        twist.linear.y = 0.0
+        self.movement_publisher.publish(twist)
+        self.get_logger().info(f"Robot strafing complete: direction={direction}, speed={speed}")
 
 def main(args=None):
     rclpy.init(args=args)
